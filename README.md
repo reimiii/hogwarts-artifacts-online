@@ -21,6 +21,7 @@ https://github.com/reimiii/hogwarts-artifacts-online/issues?q=is%3Aissue+is%3Aop
 ## design
 API-First Approach Design a User Story  
 open-api: https://app.swaggerhub.com/apis/Washingtonwei/hogwarts-openapi/1.0.0
+Object-Oriented Design Using Class Diagram from Schema in open-api
 
 ## Implementation and Testing
 TDD
