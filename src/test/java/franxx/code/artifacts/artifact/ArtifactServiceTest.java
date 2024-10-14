@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -66,6 +67,24 @@ class ArtifactServiceTest {
     assertThat(returnArtifact.getId()).isEqualTo(artifact.getId());
     assertThat(returnArtifact.getName()).isEqualTo(artifact.getName());
     assertThat(returnArtifact.getWizard()).isEqualTo(wizard);
+
+    verify(artifactRepository, times(1)).findById("1122");
+  }
+
+  @Test
+  void testFindByIdNotFound() {
+    // given
+    given(artifactRepository.findById(Mockito.any(String.class)))
+        .willReturn(Optional.empty());
+
+    // when
+    Throwable thrown = Assertions.catchThrowable(() -> {
+      Artifact returnArtifact = artifactService.findById("1122");
+    });
+
+    // then
+    assertThat(thrown).isInstanceOf(ArtifactNotFoundException.class)
+        .hasMessage("could not found artifact with id: 1122");
 
     verify(artifactRepository, times(1)).findById("1122");
   }
