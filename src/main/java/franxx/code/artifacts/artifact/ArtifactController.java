@@ -1,5 +1,7 @@
 package franxx.code.artifacts.artifact;
 
+import franxx.code.artifacts.artifact.converter.ArtifactToDtoConverter;
+import franxx.code.artifacts.artifact.dto.ArtifactDto;
 import franxx.code.artifacts.system.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -12,17 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtifactController {
 
   private final ArtifactService artifactService;
+  private final ArtifactToDtoConverter artifactToDtoConverter;
 
-  public ArtifactController(ArtifactService artifactService) {
+  public ArtifactController(ArtifactService artifactService, ArtifactToDtoConverter artifactToDtoConverter) {
     this.artifactService = artifactService;
+    this.artifactToDtoConverter = artifactToDtoConverter;
   }
 
   @GetMapping(
       path = "/api/v1/artifacts/{artifactId}",
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public Result<Artifact> findArtifactById(@PathVariable String artifactId) {
+  public Result<ArtifactDto> findArtifactById(@PathVariable String artifactId) {
     Artifact artifact = this.artifactService.findById(artifactId);
-    return new Result<>(true, HttpStatus.OK.value(), "find one success", artifact);
+    ArtifactDto converted = this.artifactToDtoConverter.convert(artifact);
+    return new Result<>(true, HttpStatus.OK.value(), "find one success", converted);
   }
 }

@@ -54,4 +54,9 @@ public class Wizard implements Serializable {
     artifact.setWizard(this);
     this.artifacts.add(artifact);
   }
+
+  // source.getArtifacts().size() in Converter class is know to much about the internal working (law of demeter)
+  public Integer getNumberOfArtifacts() {
+    return this.artifacts.size();
+  }
 }
