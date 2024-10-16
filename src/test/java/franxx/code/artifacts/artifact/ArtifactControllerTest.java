@@ -1,5 +1,6 @@
 package franxx.code.artifacts.artifact;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.MockMvcBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,6 +68,8 @@ class ArtifactControllerTest {
         .andExpect(jsonPath("$.message").value("find one success"))
         .andExpect(jsonPath("$.data.id").value("1220"))
         .andExpect(jsonPath("$.data.name").value("Ring of Power"));
+
+    verify(this.artifactService, times(1)).findById("1220");
   }
 
   @Test
@@ -81,5 +87,30 @@ class ArtifactControllerTest {
         .andExpect(jsonPath("$.code").value(HttpStatus.NOT_FOUND.value()))
         .andExpect(jsonPath("$.message").value("could not found artifact with id: 1220"))
         .andExpect(jsonPath("$.data").isEmpty());
+
+    verify(this.artifactService, times(1)).findById("1220");
+  }
+
+  @Test
+  void testFindAllArtifactsSuccess() throws Exception {
+    // given
+    given(this.artifactService.findAll()).willReturn(this.artifactList);
+
+    // when and then
+    this.mockMvc.perform(
+            get("/api/v1/artifacts")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(jsonPath("$.flag").value(true))
+        .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+        .andExpect(jsonPath("$.message").value("find all success"))
+        .andExpect(jsonPath("$.data", Matchers.hasSize(this.artifactList.size())))
+        .andExpect(jsonPath("$.data[0].id").value("1223"))
+        .andExpect(jsonPath("$.data[0].name").value("Invisibility Cloak"))
+        .andExpect(jsonPath("$.data[1].id").value("1224"))
+        .andExpect(jsonPath("$.data[1].name").value("Excalibur"))
+        ;
+
+    verify(this.artifactService, times(1)).findAll();
   }
 }
