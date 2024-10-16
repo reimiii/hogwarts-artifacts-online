@@ -46,7 +46,12 @@ public class Wizard implements Serializable {
     return artifacts;
   }
 
-  public void setArtifacts(List<Artifact> artifacts) {
+  public void setArtifact(List<Artifact> artifacts) {
     this.artifacts = artifacts;
+  }
+
+  public void setArtifact(Artifact artifact) {
+    artifact.setWizard(this);
+    this.artifacts.add(artifact);
   }
 }

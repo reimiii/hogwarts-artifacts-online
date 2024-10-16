@@ -1,20 +1,19 @@
 package franxx.code.artifacts.artifact;
 
 import franxx.code.artifacts.wizard.Wizard;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 
-@Entity(name = "artifacts")
+@Entity @Table(name = "artifacts")
 public class Artifact implements Serializable {
 
   @Id
   private String id;
   private String name;
   private String description;
+
+  @Column(name = "image_url")
   private String imageUrl;
 
   @ManyToOne @JoinColumn(name = "wizard_id", referencedColumnName = "id")
