@@ -1,5 +1,6 @@
 package franxx.code.artifacts.artifact;
 
+import franxx.code.artifacts.artifact.utils.IdWorker;
 import franxx.code.artifacts.wizard.Wizard;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -27,8 +28,9 @@ class ArtifactServiceTest {
   @Mock // object ini jangan pake yang aslinya
   ArtifactRepository artifactRepository;
 
-  @InjectMocks
-  ArtifactService artifactService;
+  @Mock IdWorker idWorker;
+
+  @InjectMocks ArtifactService artifactService;
 
   List<Artifact> artifacts;
 
@@ -122,4 +124,30 @@ class ArtifactServiceTest {
     assertThat(actualArtifacts.size()).isEqualTo(this.artifacts.size());
     verify(this.artifactRepository, times(1)).findAll();
   }
+
+  @Test
+  void testSaveSuccess() {
+    // given
+    Artifact artifact = new Artifact();
+    artifact.setName("Artifact Mock");
+    artifact.setDescription("Description...");
+    artifact.setImageUrl("Image....");
+
+    given(this.idWorker.nextId()).willReturn(1234L);
+    given(this.artifactRepository.save(artifact)).willReturn(artifact);
+
+    // when
+
+    Artifact savedArtifact = this.artifactService.save(artifact);
+
+    // then
+    assertThat(savedArtifact.getId()).isEqualTo("1234");
+    assertThat(savedArtifact.getName()).isEqualTo(artifact.getName());
+    assertThat(savedArtifact.getDescription()).isEqualTo(artifact.getDescription());
+    assertThat(savedArtifact.getImageUrl()).isEqualTo(artifact.getImageUrl());
+
+    verify(this.artifactRepository, times(1)).save(artifact);
+    verify(this.idWorker, times(1)).nextId();
+  }
+
 }

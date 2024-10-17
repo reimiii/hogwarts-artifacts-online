@@ -1,8 +1,10 @@
 package franxx.code.artifacts.artifact;
 
 import franxx.code.artifacts.artifact.converter.ArtifactToDtoConverter;
+import franxx.code.artifacts.artifact.converter.DtoToArtifactConverter;
 import franxx.code.artifacts.artifact.dto.ArtifactDto;
 import franxx.code.artifacts.system.Result;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -16,10 +18,12 @@ public class ArtifactController {
 
   private final ArtifactService artifactService;
   private final ArtifactToDtoConverter artifactToDtoConverter;
+  private final DtoToArtifactConverter dtoToArtifactConverter;
 
-  public ArtifactController(ArtifactService artifactService, ArtifactToDtoConverter artifactToDtoConverter) {
+  public ArtifactController(ArtifactService artifactService, ArtifactToDtoConverter artifactToDtoConverter, DtoToArtifactConverter dtoToArtifactConverter) {
     this.artifactService = artifactService;
     this.artifactToDtoConverter = artifactToDtoConverter;
+    this.dtoToArtifactConverter = dtoToArtifactConverter;
   }
 
   @GetMapping(
@@ -52,7 +56,11 @@ public class ArtifactController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
-  public Result addArtifact(@RequestBody ArtifactDto artifactDto) {
-    return null;
+  public Result<ArtifactDto> addArtifact(@Valid @RequestBody ArtifactDto artifactDto) {
+    Artifact converted = this.dtoToArtifactConverter.convert(artifactDto);
+    Artifact saved = this.artifactService.save(converted);
+    ArtifactDto convertedDto = this.artifactToDtoConverter.convert(saved);
+
+    return new Result<>(true, HttpStatus.OK.value(), "add success", convertedDto);
   }
 }

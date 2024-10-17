@@ -1,9 +1,13 @@
 package franxx.code.artifacts.artifact;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import franxx.code.artifacts.artifact.dto.ArtifactDto;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,6 +39,8 @@ class ArtifactControllerTest {
 
   @MockBean
   ArtifactService artifactService;
+
+  @Autowired ObjectMapper objectMapper;
 
   List<Artifact> artifactList;
 
@@ -109,8 +115,42 @@ class ArtifactControllerTest {
         .andExpect(jsonPath("$.data[0].name").value("Invisibility Cloak"))
         .andExpect(jsonPath("$.data[1].id").value("1224"))
         .andExpect(jsonPath("$.data[1].name").value("Excalibur"))
-        ;
+    ;
 
     verify(this.artifactService, times(1)).findAll();
+  }
+
+  @Test
+  void testAddArtifactSuccess() throws Exception {
+
+    // given
+    // in client create only name, description, image_url
+    ArtifactDto artifactDto = new ArtifactDto(null, "From Contoller", "Descrp...", "url...", null);
+    String json = this.objectMapper.writeValueAsString(artifactDto);
+
+    System.out.println(json);
+
+    Artifact artifact = new Artifact("112", "From Contoller", "Descrp...", "url...");
+
+    given(this.artifactService.save(Mockito.any(Artifact.class))).willReturn(artifact);
+
+    // when and then
+    this.mockMvc.perform(
+            post("/api/v1/artifacts")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
+        .andExpect(jsonPath("$.flag").value(true))
+        .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+        .andExpect(jsonPath("$.message").value("add success"))
+        .andExpect(jsonPath("$.data.id").isNotEmpty())
+        .andExpect(jsonPath("$.data.name").value(artifact.getName()))
+        .andExpect(jsonPath("$.data.owner").isEmpty())
+
+    ;
+
+    verify(this.artifactService, times(1)).save(Mockito.any(Artifact.class));
+
   }
 }
