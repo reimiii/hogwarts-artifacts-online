@@ -150,4 +150,66 @@ class ArtifactServiceTest {
     verify(this.idWorker, times(1)).nextId();
   }
 
+  @Test
+  void testUpdateSuccess() {
+    // given
+
+    Artifact oldArtifact = new Artifact();
+    oldArtifact.setId("1");
+    oldArtifact.setName("Artifact Mock");
+    oldArtifact.setDescription("Description...");
+    oldArtifact.setImageUrl("Image....");
+
+    // for expected update
+    Artifact updateA = new Artifact(
+        "1",
+        "New Name",
+        "new Desc",
+        "new image"
+    );
+
+    given(this.artifactRepository.findById("1")).willReturn(Optional.of(oldArtifact));
+
+    // update object oldArtifact in service, and will return same object with updated data
+    given(this.artifactRepository.save(oldArtifact)).willReturn(oldArtifact);
+
+    // when
+
+    // di sini pas di pas id update di paggil save nya, isi dari
+    // oldArtifact bakalan ke ganti ama updateA...
+    Artifact updatedArtifact = this.artifactService.update("1", updateA);
+
+
+    // then
+    assertThat(updatedArtifact.getId()).isEqualTo(updateA.getId());
+    assertThat(updatedArtifact.getName()).isEqualTo(updateA.getName());
+    assertThat(updatedArtifact.getDescription()).isEqualTo(updateA.getDescription());
+
+    System.out.println(updateA.getName());
+    System.out.println(updatedArtifact.getName());
+
+    verify(this.artifactRepository, times(1)).findById("1");
+    verify(this.artifactRepository, times(1)).save(oldArtifact);
+  }
+
+  @Test
+  void testUpdateNotFound() {
+    // given
+    Artifact oldArtifact = new Artifact();
+    oldArtifact.setName("Artifact Mock");
+    oldArtifact.setDescription("Description...");
+    oldArtifact.setImageUrl("Image....");
+
+    given(this.artifactRepository.findById("1")).willReturn(Optional.empty());
+
+    // when
+
+    assertThrows(ArtifactNotFoundException.class, () -> {
+      this.artifactService.update("1", oldArtifact);
+    });
+
+    // then
+    verify(this.artifactRepository, times(1)).findById("1");
+    verify(this.artifactRepository, times(0)).save(oldArtifact);
+  }
 }

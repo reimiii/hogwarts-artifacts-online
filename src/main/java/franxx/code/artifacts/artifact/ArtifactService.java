@@ -31,4 +31,18 @@ public class ArtifactService {
     return this.artifactRepository.save(artifact);
   }
 
+  public Artifact update(String id, Artifact update) {
+
+    return this.artifactRepository.findById(id)
+        .map(old -> {
+
+          old.setName(update.getName());
+          old.setDescription(update.getDescription());
+          old.setImageUrl(update.getImageUrl());
+
+          return this.artifactRepository.save(old);
+        })
+        .orElseThrow(() -> new ArtifactNotFoundException(id));
+  }
+
 }

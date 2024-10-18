@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -152,5 +154,91 @@ class ArtifactControllerTest {
 
     verify(this.artifactService, times(1)).save(Mockito.any(Artifact.class));
 
+  }
+
+  @Test
+  void testUpdateArtifactSuccess() throws Exception {
+    // given
+    // in client create only name, description, image_url
+    // from client side the front end
+    ArtifactDto artifactDto = new ArtifactDto(
+        "112",
+        "New Name",
+        "new Desc",
+        "new image",
+        null
+    );
+
+    String json = this.objectMapper.writeValueAsString(artifactDto);
+
+    System.out.println(json);
+
+    // this is return from the service
+    Artifact updateArtifact = new Artifact(
+        "112",
+        "New Name",
+        "new Desc",
+        "new image"
+    );
+
+    given(this.artifactService.update(eq("112"), Mockito.any(Artifact.class))).willReturn(updateArtifact);
+
+    // when and then
+    this.mockMvc.perform(
+            put("/api/v1/artifacts/112")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
+        .andExpect(jsonPath("$.flag").value(true))
+        .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+        .andExpect(jsonPath("$.message").value("update success"))
+        .andExpect(jsonPath("$.data.id").value("112"))
+        .andExpect(jsonPath("$.data.name").value(updateArtifact.getName()))
+        .andExpect(jsonPath("$.data.description").value(updateArtifact.getDescription()))
+        .andExpect(jsonPath("$.data.owner").isEmpty())
+
+    ;
+
+    verify(this.artifactService, times(1)).update(eq("112"), Mockito.any(Artifact.class));
+  }
+
+  @Test
+  void testUpdateArtifactErrorWithNonExistingId() throws Exception {
+    // given
+    // in client create only name, description, image_url
+    // from client side the front end
+    ArtifactDto artifactDto = new ArtifactDto(
+        "112",
+        "New Name",
+        "new Desc",
+        "new image",
+        null
+    );
+
+    String json = this.objectMapper.writeValueAsString(artifactDto);
+
+    System.out.println(json);
+
+    // this is return from the service
+
+    given(this.artifactService.update(eq("112"), Mockito.any(Artifact.class)))
+        .willThrow(new ArtifactNotFoundException("112"));
+
+    // when and then
+    this.mockMvc.perform(
+            put("/api/v1/artifacts/112")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+        )
+        .andExpect(jsonPath("$.flag").value(false))
+        .andExpect(jsonPath("$.code").value(HttpStatus.NOT_FOUND.value()))
+        .andExpect(jsonPath("$.message").value("could not found artifact with id: 112"))
+        .andExpect(jsonPath("$.data").isEmpty())
+
+    ;
+
+    verify(this.artifactService, times(1)).update(eq("112"), Mockito.any(Artifact.class));
   }
 }

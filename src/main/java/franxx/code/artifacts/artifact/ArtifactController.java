@@ -63,4 +63,21 @@ public class ArtifactController {
 
     return new Result<>(true, HttpStatus.OK.value(), "add success", convertedDto);
   }
+
+  @PutMapping(
+      path = "/api/v1/artifacts/{artifactId}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Result<ArtifactDto> updateArtifact(
+      @PathVariable String artifactId,
+      @Valid @RequestBody ArtifactDto artifactDto
+  ) {
+
+    Artifact convert = this.dtoToArtifactConverter.convert(artifactDto);
+    Artifact updated = this.artifactService.update(artifactId, convert);
+    ArtifactDto dto = this.artifactToDtoConverter.convert(updated);
+
+    return new Result<>(true, HttpStatus.OK.value(), "update success", dto);
+  }
 }
