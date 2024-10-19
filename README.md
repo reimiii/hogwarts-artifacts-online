@@ -21,9 +21,23 @@ https://github.com/reimiii/hogwarts-artifacts-online/issues?q=is%3Aissue+is%3Aop
 ## design
 API-First Approach Design a User Story  
 open-api: https://app.swaggerhub.com/apis/Washingtonwei/hogwarts-openapi/1.0.0
+Object-Oriented Design Using Class Diagram from Schema in open-api
 
 ## Implementation and Testing
-TDD
+TDD - Test Driven Development   
+Using: Red, Green and Refactor Development Cycle    
+- Red 
+  - Write a unit test.   
+  - test fail (karna blm implemnt code nya)
+  - next
+- Green 
+  - write just enough code to make the test pass
+  - test pass
+  - next
+- Refactor
+  - make more maintainable and robust
+  - optimize the code
+  - repeat
 
 ## Deployment
 CI/CD
