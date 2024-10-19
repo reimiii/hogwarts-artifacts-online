@@ -1,13 +1,17 @@
 package franxx.code.artifacts.wizard;
 
 import franxx.code.artifacts.artifact.Artifact;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.CascadeType.MERGE;
+import static jakarta.persistence.CascadeType.PERSIST;
 
 @Entity @Table(name = "wizards")
 public class Wizard implements Serializable {

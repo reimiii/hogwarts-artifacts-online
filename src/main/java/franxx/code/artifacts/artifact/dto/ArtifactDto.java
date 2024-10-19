@@ -1,6 +1,5 @@
 package franxx.code.artifacts.artifact.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import franxx.code.artifacts.wizard.dto.WizardDto;
 import jakarta.validation.constraints.NotEmpty;
 

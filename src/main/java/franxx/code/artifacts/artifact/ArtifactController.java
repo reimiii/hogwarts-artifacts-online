@@ -6,12 +6,10 @@ import franxx.code.artifacts.artifact.dto.ArtifactDto;
 import franxx.code.artifacts.system.Result;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController @RequestMapping(path = "/api/v1/artifacts")
 public class ArtifactController {
