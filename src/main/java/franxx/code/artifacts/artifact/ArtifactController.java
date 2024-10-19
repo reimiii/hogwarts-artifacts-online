@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@RestController @RequestMapping(path = "/api/v1/artifacts")
 public class ArtifactController {
 
   private final ArtifactService artifactService;
@@ -27,7 +27,7 @@ public class ArtifactController {
   }
 
   @GetMapping(
-      path = "/api/v1/artifacts/{artifactId}",
+      path = "/{artifactId}",
       produces = MediaType.APPLICATION_JSON_VALUE
   )
   public Result<ArtifactDto> findArtifactById(@PathVariable String artifactId) {
@@ -37,7 +37,6 @@ public class ArtifactController {
   }
 
   @GetMapping(
-      path = "/api/v1/artifacts",
       produces = MediaType.APPLICATION_JSON_VALUE
   )
   public Result<List<ArtifactDto>> findAllArtifacts() {
@@ -52,7 +51,6 @@ public class ArtifactController {
   }
 
   @PostMapping(
-      path = "/api/v1/artifacts",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
@@ -65,7 +63,7 @@ public class ArtifactController {
   }
 
   @PutMapping(
-      path = "/api/v1/artifacts/{artifactId}",
+      path = "/{artifactId}",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE
   )
@@ -79,5 +77,14 @@ public class ArtifactController {
     ArtifactDto dto = this.artifactToDtoConverter.convert(updated);
 
     return new Result<>(true, HttpStatus.OK.value(), "update success", dto);
+  }
+
+  @DeleteMapping(
+      path = "/{artifactId}",
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public Result<Void> deleteArtifact(@PathVariable String artifactId) {
+    this.artifactService.delete(artifactId);
+    return new Result<>(true, HttpStatus.OK.value(), "delete success");
   }
 }

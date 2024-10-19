@@ -32,7 +32,6 @@ public class ArtifactService {
   }
 
   public Artifact update(String id, Artifact update) {
-
     return this.artifactRepository.findById(id)
         .map(old -> {
 
@@ -43,6 +42,12 @@ public class ArtifactService {
           return this.artifactRepository.save(old);
         })
         .orElseThrow(() -> new ArtifactNotFoundException(id));
+  }
+
+  public void delete(String id) {
+    this.artifactRepository.findById(id)
+        .orElseThrow(() -> new ArtifactNotFoundException(id));
+    this.artifactRepository.deleteById(id);
   }
 
 }

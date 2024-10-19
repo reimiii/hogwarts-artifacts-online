@@ -19,8 +19,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ArtifactServiceTest {
@@ -168,9 +167,12 @@ class ArtifactServiceTest {
         "new image"
     );
 
+    // return oldArtifact lalu di kelola, di ganti isi nya dengan isi dari param ke 2
+    // yaitu updateA
     given(this.artifactRepository.findById("1")).willReturn(Optional.of(oldArtifact));
 
     // update object oldArtifact in service, and will return same object with updated data
+    // dan save object yang udh di ganti return objeck oldArtifact yang sama di memory, dengan data yang udh berubah
     given(this.artifactRepository.save(oldArtifact)).willReturn(oldArtifact);
 
     // when
@@ -211,5 +213,41 @@ class ArtifactServiceTest {
     // then
     verify(this.artifactRepository, times(1)).findById("1");
     verify(this.artifactRepository, times(0)).save(oldArtifact);
+  }
+
+  @Test
+  void testDeleteArtifactSuccess() {
+
+    // given
+    Artifact d = new Artifact();
+    d.setId("1");
+    d.setName("Artifact Mock");
+    d.setDescription("Description...");
+    d.setImageUrl("Image....");
+
+    given(this.artifactRepository.findById("1")).willReturn(Optional.of(d));
+    doNothing().when(this.artifactRepository).deleteById("1");
+
+    // when
+    this.artifactService.delete("1");
+
+    // then
+    verify(this.artifactRepository, times(1)).findById("1");
+    verify(this.artifactRepository, times(1)).deleteById("1");
+
+  }
+
+  @Test
+  void testDeleteArtifactNotFound() {
+
+    // given
+    given(this.artifactRepository.findById("1")).willReturn(Optional.empty());
+
+    // when
+    assertThrows(ArtifactNotFoundException.class, () -> this.artifactService.delete("1"));
+
+    // then
+    verify(this.artifactRepository, times(1)).findById("1");
+    verify(this.artifactRepository, times(0)).deleteById(anyString());
   }
 }

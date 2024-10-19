@@ -24,8 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.MockMvcBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -236,9 +235,48 @@ class ArtifactControllerTest {
         .andExpect(jsonPath("$.code").value(HttpStatus.NOT_FOUND.value()))
         .andExpect(jsonPath("$.message").value("could not found artifact with id: 112"))
         .andExpect(jsonPath("$.data").isEmpty())
-
     ;
 
     verify(this.artifactService, times(1)).update(eq("112"), Mockito.any(Artifact.class));
+  }
+
+  @Test
+  void testDeleteArtifactSuccess() throws Exception {
+    // given
+    doNothing().when(this.artifactService).delete("1");
+
+    // when and then
+    this.mockMvc.perform(
+            delete("/api/v1/artifacts/1")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(jsonPath("$.flag").value(true))
+        .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+        .andExpect(jsonPath("$.message").value("delete success"))
+        .andExpect(jsonPath("$.data").isEmpty())
+    ;
+
+    verify(this.artifactService, times(1)).delete(anyString());
+  }
+
+  @Test
+  void testDeleteArtifactNotFound() throws Exception {
+    // given
+    doThrow(new ArtifactNotFoundException("1"))
+        .when(this.artifactService).delete("1");
+
+    // when and then
+    this.mockMvc.perform(
+            delete("/api/v1/artifacts/1")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.flag").value(false))
+        .andExpect(jsonPath("$.code").value(HttpStatus.NOT_FOUND.value()))
+        .andExpect(jsonPath("$.message").value("could not found artifact with id: 1"))
+        .andExpect(jsonPath("$.data").isEmpty())
+    ;
+
+    verify(this.artifactService, times(1)).delete("1");
   }
 }
