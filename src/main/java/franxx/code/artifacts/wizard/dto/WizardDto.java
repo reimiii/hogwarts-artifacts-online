@@ -1,9 +1,9 @@
 package franxx.code.artifacts.wizard.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 
 public record WizardDto(
     Integer id,
-    String name,
-    @JsonProperty("number_of_artifact") Integer numberOfArtifact
+    @NotEmpty(message = "name is required") String name,
+    Integer numberOfArtifact
 ) {}

@@ -1,6 +1,7 @@
 package franxx.code.artifacts.artifact;
 
 import franxx.code.artifacts.artifact.utils.IdWorker;
+import franxx.code.artifacts.system.exception.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,7 @@ public class ArtifactService {
 
   public Artifact findById(String artifactId) {
     return this.artifactRepository.findById(artifactId)
-        .orElseThrow(() -> new ArtifactNotFoundException(artifactId));
+        .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
   }
 
   public List<Artifact> findAll() {
@@ -41,12 +42,12 @@ public class ArtifactService {
 
           return this.artifactRepository.save(old);
         })
-        .orElseThrow(() -> new ArtifactNotFoundException(id));
+        .orElseThrow(() -> new ObjectNotFoundException("artifact", id));
   }
 
   public void delete(String id) {
     this.artifactRepository.findById(id)
-        .orElseThrow(() -> new ArtifactNotFoundException(id));
+        .orElseThrow(() -> new ObjectNotFoundException("artifact", id));
     this.artifactRepository.deleteById(id);
   }
 

@@ -1,10 +1,7 @@
 package franxx.code.artifacts.wizard;
 
 import franxx.code.artifacts.artifact.Artifact;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +13,7 @@ import static jakarta.persistence.CascadeType.PERSIST;
 @Entity @Table(name = "wizards")
 public class Wizard implements Serializable {
 
-  @Id
+  @Id @GeneratedValue(strategy = GenerationType.AUTO)
   private Integer id;
   private String name;
 
@@ -63,4 +60,11 @@ public class Wizard implements Serializable {
   public Integer getNumberOfArtifacts() {
     return this.artifacts.size();
   }
+
+  public void removeAllArtifacts() {
+    this.artifacts.stream()
+        .forEach(a -> a.setWizard(null));
+    this.artifacts = null;
+  }
+
 }

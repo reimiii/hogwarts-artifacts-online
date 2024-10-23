@@ -1,6 +1,5 @@
 package franxx.code.artifacts.system.exception;
 
-import franxx.code.artifacts.artifact.ArtifactNotFoundException;
 import franxx.code.artifacts.system.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -17,9 +16,9 @@ import java.util.Map;
 @RestControllerAdvice
 public class ExceptionHandlerAdvice {
 
-  @ExceptionHandler(ArtifactNotFoundException.class)
+  @ExceptionHandler(ObjectNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  Result<Void> handleArtifactNotFoundException(ArtifactNotFoundException ex) {
+  Result<Void> handleObjectNotFoundException(ObjectNotFoundException ex) {
     return new Result<>(false, HttpStatus.NOT_FOUND.value(), ex.getMessage());
   }
 
