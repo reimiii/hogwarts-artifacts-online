@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController @RequestMapping(path = "/api/v1/artifacts")
+@RestController @RequestMapping(path = "${api.endpoint.base-url}/artifacts")
 public class ArtifactController {
 
   private final ArtifactService artifactService;
@@ -34,9 +34,7 @@ public class ArtifactController {
     return new Result<>(true, HttpStatus.OK.value(), "find one success", converted);
   }
 
-  @GetMapping(
-      produces = MediaType.APPLICATION_JSON_VALUE
-  )
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public Result<List<ArtifactDto>> findAllArtifacts() {
     List<Artifact> foundArtifacts = this.artifactService.findAll();
 

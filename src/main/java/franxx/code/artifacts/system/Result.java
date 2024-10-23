@@ -54,4 +54,13 @@ public class Result<T> {
     this.data = data;
   }
 
+  @Override
+  public String toString() {
+    return "Result{" +
+        "flag=" + flag +
+        ", code=" + code +
+        ", message='" + message + '\'' +
+        ", data=" + data +
+        '}';
+  }
 }

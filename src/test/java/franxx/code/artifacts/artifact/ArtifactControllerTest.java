@@ -2,12 +2,14 @@ package franxx.code.artifacts.artifact;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import franxx.code.artifacts.artifact.dto.ArtifactDto;
+import franxx.code.artifacts.system.exception.ObjectNotFoundException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,6 +41,9 @@ class ArtifactControllerTest {
 
   List<Artifact> artifactList;
 
+  @Value("${api.endpoint.base-url}")
+  String baseUrl;
+
   @BeforeEach
   void setUp() {
     this.artifactList = new ArrayList<>();
@@ -61,7 +66,7 @@ class ArtifactControllerTest {
 
     // when and then
     this.mockMvc.perform(
-            get("/api/v1/artifacts/1220")
+            get(this.baseUrl + "/artifacts/1220")
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(jsonPath("$.flag").value(true))
@@ -77,11 +82,11 @@ class ArtifactControllerTest {
   void testFindArtifactByIdNotFound() throws Exception {
     // given
     given(this.artifactService.findById("1220"))
-        .willThrow(new ArtifactNotFoundException("1220"));
+        .willThrow(new ObjectNotFoundException("artifact", "1220"));
 
     // when and then
     this.mockMvc.perform(
-            get("/api/v1/artifacts/1220")
+            get(this.baseUrl + "/artifacts/1220")
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(jsonPath("$.flag").value(false))
@@ -99,7 +104,7 @@ class ArtifactControllerTest {
 
     // when and then
     this.mockMvc.perform(
-            get("/api/v1/artifacts")
+            get(this.baseUrl + "/artifacts")
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(jsonPath("$.flag").value(true))
@@ -131,7 +136,7 @@ class ArtifactControllerTest {
 
     // when and then
     this.mockMvc.perform(
-            post("/api/v1/artifacts")
+            post(this.baseUrl + "/artifacts")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -178,7 +183,7 @@ class ArtifactControllerTest {
 
     // when and then
     this.mockMvc.perform(
-            put("/api/v1/artifacts/112")
+            put(this.baseUrl + "/artifacts/112")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -216,11 +221,11 @@ class ArtifactControllerTest {
     // this is return from the service
 
     given(this.artifactService.update(eq("112"), Mockito.any(Artifact.class)))
-        .willThrow(new ArtifactNotFoundException("112"));
+        .willThrow(new ObjectNotFoundException("artifact", "112"));
 
     // when and then
     this.mockMvc.perform(
-            put("/api/v1/artifacts/112")
+            put(this.baseUrl + "/artifacts/112")
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
@@ -241,7 +246,7 @@ class ArtifactControllerTest {
 
     // when and then
     this.mockMvc.perform(
-            delete("/api/v1/artifacts/1")
+            delete(this.baseUrl + "/artifacts/1")
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(jsonPath("$.flag").value(true))
@@ -256,12 +261,12 @@ class ArtifactControllerTest {
   @Test
   void testDeleteArtifactNotFound() throws Exception {
     // given
-    doThrow(new ArtifactNotFoundException("1"))
+    doThrow(new ObjectNotFoundException("artifact", "1"))
         .when(this.artifactService).delete("1");
 
     // when and then
     this.mockMvc.perform(
-            delete("/api/v1/artifacts/1")
+            delete(this.baseUrl + "/artifacts/1")
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isNotFound())

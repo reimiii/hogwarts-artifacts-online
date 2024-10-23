@@ -1,6 +1,7 @@
 package franxx.code.artifacts.artifact;
 
 import franxx.code.artifacts.artifact.utils.IdWorker;
+import franxx.code.artifacts.system.exception.ObjectNotFoundException;
 import franxx.code.artifacts.wizard.Wizard;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -100,12 +101,10 @@ class ArtifactServiceTest {
         .willReturn(Optional.empty());
 
     // when
-    Throwable thrown = Assertions.catchThrowable(() -> {
-      Artifact returnArtifact = this.artifactService.findById("1122");
-    });
+    Throwable thrown = Assertions.catchThrowable(() -> this.artifactService.findById("1122"));
 
     // then
-    assertThat(thrown).isInstanceOf(ArtifactNotFoundException.class)
+    assertThat(thrown).isInstanceOf(ObjectNotFoundException.class)
         .hasMessage("could not found artifact with id: 1122");
 
     verify(this.artifactRepository, times(1)).findById("1122");
@@ -206,9 +205,7 @@ class ArtifactServiceTest {
 
     // when
 
-    assertThrows(ArtifactNotFoundException.class, () -> {
-      this.artifactService.update("1", oldArtifact);
-    });
+    assertThrows(ObjectNotFoundException.class, () -> this.artifactService.update("1", oldArtifact));
 
     // then
     verify(this.artifactRepository, times(1)).findById("1");
@@ -244,7 +241,7 @@ class ArtifactServiceTest {
     given(this.artifactRepository.findById("1")).willReturn(Optional.empty());
 
     // when
-    assertThrows(ArtifactNotFoundException.class, () -> this.artifactService.delete("1"));
+    assertThrows(ObjectNotFoundException.class, () -> this.artifactService.delete("1"));
 
     // then
     verify(this.artifactRepository, times(1)).findById("1");
