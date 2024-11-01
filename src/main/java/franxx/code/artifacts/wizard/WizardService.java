@@ -1,5 +1,7 @@
 package franxx.code.artifacts.wizard;
 
+import franxx.code.artifacts.artifact.Artifact;
+import franxx.code.artifacts.artifact.ArtifactRepository;
 import franxx.code.artifacts.system.exception.ObjectNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,9 +11,11 @@ import java.util.List;
 @Service @Transactional
 public class WizardService {
   private final WizardRepository wizardRepository;
+  private final ArtifactRepository artifactRepository;
 
-  public WizardService(WizardRepository wizardRepository) {
+  public WizardService(WizardRepository wizardRepository, ArtifactRepository artifactRepository) {
     this.wizardRepository = wizardRepository;
+    this.artifactRepository = artifactRepository;
   }
 
   @Transactional(readOnly = true)
@@ -43,5 +47,25 @@ public class WizardService {
         .orElseThrow(() -> new ObjectNotFoundException("wizard", id));
     wizardToBeDeleted.removeAllArtifacts();
     this.wizardRepository.deleteById(id);
+  }
+
+  public void assignArtifact(Integer wizardId, String artifactId) {
+    // find this wizard by id from db
+    Wizard wizard = this.wizardRepository.findById(wizardId)
+        .orElseThrow(() -> new ObjectNotFoundException("wizard", wizardId));
+
+    // find this artifact by id from db
+    Artifact artifactToBeAssign = this.artifactRepository.findById(artifactId)
+        .orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
+
+    // artifact assignment
+    // need to check if artifact is owned by some wizard
+    if (artifactToBeAssign.getWizard() != null) {
+      artifactToBeAssign
+          .getWizard()
+          .removeArtifact(artifactToBeAssign);
+    }
+
+    wizard.setArtifact(artifactToBeAssign);
   }
 }

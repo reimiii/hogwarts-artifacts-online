@@ -284,6 +284,7 @@ class WizardControllerTest {
     // verify
     verify(this.wizardService, times(1)).delete(9);
   }
+
   @Test
   void testDeleteWizardNotFound() throws Exception {
     // form client
@@ -305,4 +306,67 @@ class WizardControllerTest {
     // verify
     verify(this.wizardService, times(1)).delete(9);
   }
+
+  @Test
+  void testAssignArtifactSuccess() throws Exception {
+    // given
+    doNothing().when(this.wizardService).assignArtifact(1, "123");
+
+    // when and then
+    this.mockMvc.perform(
+            put(this.baseUrl + "/wizards/1/artifacts/123")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(jsonPath("$.flag").value(true))
+        .andExpect(jsonPath("$.code").value(HttpStatus.OK.value()))
+        .andExpect(jsonPath("$.message").value("artifact assignment success"))
+        .andExpect(jsonPath("$.data").isEmpty())
+    ;
+
+    // verify
+    verify(this.wizardService, times(1)).assignArtifact(1, "123");
+  }
+
+  @Test
+  void testAssignArtifactNotFoundWizard() throws Exception {
+    // given
+    doThrow(new ObjectNotFoundException("wizard", 4))
+        .when(this.wizardService).assignArtifact(4, "123");
+
+    // when and then
+    this.mockMvc.perform(
+            put(this.baseUrl + "/wizards/4/artifacts/123")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(jsonPath("$.flag").value(false))
+        .andExpect(jsonPath("$.code").value(HttpStatus.NOT_FOUND.value()))
+        .andExpect(jsonPath("$.message").value("could not found wizard with id: 4"))
+        .andExpect(jsonPath("$.data").isEmpty())
+    ;
+
+    // verify
+    verify(this.wizardService, times(1)).assignArtifact(4, "123");
+  }
+
+  @Test
+  void testAssignArtifactNotFoundArtifact() throws Exception {
+    // given
+    doThrow(new ObjectNotFoundException("artifact", "111"))
+        .when(this.wizardService).assignArtifact(7, "111");
+
+    // when and then
+    this.mockMvc.perform(
+            put(this.baseUrl + "/wizards/7/artifacts/111")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(jsonPath("$.flag").value(false))
+        .andExpect(jsonPath("$.code").value(HttpStatus.NOT_FOUND.value()))
+        .andExpect(jsonPath("$.message").value("could not found artifact with id: 111"))
+        .andExpect(jsonPath("$.data").isEmpty())
+    ;
+
+    // verify
+    verify(this.wizardService, times(1)).assignArtifact(7, "111");
+  }
+
 }
